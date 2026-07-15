@@ -1,0 +1,1557 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171713">
+  <title>Casefile — Instagram Report Assistant</title>
+  <style>
+    :root {
+      --ink: #e8e4d8;
+      --ink-soft: #c4bfaf;
+      --paper: #131310;
+      --paper-deep: #1c1c17;
+      --paper-lift: #22211c;
+      --cream: #181814;
+      --line: rgba(232, 228, 216, 0.12);
+      --line-strong: rgba(232, 228, 216, 0.22);
+      --signal: #c95a40;
+      --signal-dark: #e07858;
+      --signal-soft: rgba(201, 90, 64, 0.18);
+      --sage: #8a9a74;
+      --muted: #9a9587;
+      --white: #1e1e19;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.4);
+      --shadow-soft: 0 14px 38px rgba(0, 0, 0, 0.28);
+      --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --body: "Avenir Next", Avenir, "Century Gothic", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(201, 90, 64, 0.16), transparent 32%),
+        radial-gradient(circle at 15% 20%, rgba(138, 154, 116, 0.1), transparent 28%),
+        linear-gradient(rgba(232, 228, 216, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232, 228, 216, 0.03) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--body);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(140deg, rgba(201, 90, 64, 0.05), transparent 40%),
+        linear-gradient(320deg, rgba(138, 154, 116, 0.04), transparent 35%);
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(189, 76, 50, 0.28);
+      outline-offset: 3px;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+    }
+
+    .login-story {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100vh;
+      padding: clamp(32px, 6vw, 88px);
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    .login-story::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -140px;
+      bottom: -110px;
+      border: 1px solid rgba(232, 228, 216, 0.15);
+      border-radius: 50%;
+      box-shadow: 0 0 0 55px rgba(232, 228, 216, 0.03), 0 0 0 110px rgba(232, 228, 216, 0.02);
+    }
+
+    .brand-mark, .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark::before, .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 2px;
+      background: var(--signal);
+    }
+
+    .story-copy { position: relative; z-index: 1; max-width: 680px; }
+    .story-copy h1 {
+      margin: 0 0 24px;
+      max-width: 650px;
+      font: 400 clamp(3rem, 7vw, 7.4rem) / 0.89 var(--display);
+      letter-spacing: -0.055em;
+    }
+    .story-copy h1 em { color: #dc765e; font-weight: 400; }
+    .story-copy p {
+      max-width: 520px;
+      margin: 0;
+      color: rgba(232, 228, 216, 0.72);
+      font-size: clamp(1rem, 1.5vw, 1.18rem);
+      line-height: 1.75;
+    }
+    .story-foot { position: relative; z-index: 1;       color: rgba(232, 228, 216, 0.48); font-size: 0.78rem; letter-spacing: 0.08em; }
+
+    .login-panel {
+      display: grid;
+      place-items: center;
+      padding: 40px clamp(24px, 6vw, 80px);
+      background: var(--paper-deep);
+    }
+    .login-card { width: min(100%, 410px); }
+    .login-card .eyebrow { color: var(--signal-dark); margin-bottom: 24px; }
+    .login-card h2 { margin: 0 0 12px; font: 400 clamp(2.4rem, 5vw, 4rem) / 1 var(--display); letter-spacing: -0.04em; }
+    .login-card > p { margin: 0 0 36px; color: var(--muted); line-height: 1.65; }
+
+    .field { margin-bottom: 20px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    label, .label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .field-note, .char-count { color: var(--muted); font-size: 0.72rem; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 0;
+      color: var(--ink);
+      background: rgba(19, 19, 16, 0.6);
+      transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+    input, select { height: 50px; padding: 0 14px; }
+    textarea { min-height: 190px; padding: 15px; resize: vertical; line-height: 1.65; }
+    input:hover, textarea:hover, select:hover { border-color: var(--ink); }
+    input:focus, textarea:focus, select:focus { border-color: var(--signal); background: var(--paper-deep); box-shadow: 5px 5px 0 rgba(201, 90, 64, 0.15); outline: none; }
+
+    .check-line { display: flex; align-items: center; gap: 10px; margin: 4px 0 24px; color: var(--muted); font-size: 0.86rem; }
+    .check-line input, .check-item input { width: 17px; height: 17px; accent-color: var(--signal); }
+    .check-line label { margin: 0; color: inherit; font-size: inherit; font-weight: 500; letter-spacing: 0; text-transform: none; }
+
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: transparent;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, color 150ms ease;
+    }
+    .button:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4); }
+    .button:active { transform: translate(0); box-shadow: none; }
+    .button.primary { color: var(--paper); background: var(--signal); border-color: var(--signal); }
+    .button.primary:hover { box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35); }
+    .button.dark { color: var(--ink); background: var(--paper-deep); border-color: var(--line-strong); }
+    .button.ghost { border-color: var(--line-strong); }
+    .button.danger { color: var(--signal-dark); border-color: rgba(189, 76, 50, 0.44); }
+    .button.small { min-height: 36px; padding: 0 12px; font-size: 0.68rem; }
+    .button.full { width: 100%; }
+    .button:disabled { opacity: 0.55; cursor: wait; transform: none; box-shadow: none; }
+    .login-error { min-height: 22px; margin-top: 14px; color: var(--signal-dark); font-size: 0.82rem; }
+
+    .app { display: none; min-height: 100vh; }
+    .app-shell { position: relative; z-index: 1; width: min(1480px, 100%); margin: 0 auto; padding: 28px clamp(18px, 3vw, 46px) 64px; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 14px 0 24px;
+      border-bottom: 1px solid var(--line-strong);
+      background: linear-gradient(180deg, rgba(19, 19, 16, 0.96), rgba(19, 19, 16, 0.82));
+      backdrop-filter: blur(18px);
+    }
+    .topbar .brand-mark { color: var(--signal-dark); }
+    .topbar-center { color: var(--muted); font: italic 1rem var(--display); }
+    .topbar-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: clamp(28px, 7vw, 100px);
+      align-items: end;
+      padding: clamp(48px, 8vw, 108px) 0 50px;
+    }
+    .hero h1 { max-width: 850px; margin: 0; font: 400 clamp(3.4rem, 8vw, 8.8rem) / 0.84 var(--display); letter-spacing: -0.064em; }
+    .hero h1 span { color: var(--signal); }
+    .hero-aside { padding-bottom: 8px; }
+    .hero-aside p { margin: 0 0 25px; color: var(--muted); line-height: 1.7; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 25px; }
+    .hero-badge {
+      padding: 10px 14px;
+      border: 1px solid var(--line-strong);
+      background: rgba(30, 30, 25, 0.72);
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-soft);
+    }
+    .progress-line { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .progress-step { padding-top: 11px; border-top: 2px solid var(--line); color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .progress-step.active { border-color: var(--signal); color: var(--signal-dark); }
+
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--line-strong);
+      background: rgba(19, 19, 16, 0.5);
+    }
+    .stat { min-height: 104px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 22px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat-value { font: 400 2.6rem/1 var(--display); }
+    .stat-label { max-width: 90px; color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; line-height: 1.4; text-align: right; text-transform: uppercase; }
+
+    .workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 26px; margin-top: 26px; align-items: start; }
+    .sidebar, .desk {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      background: linear-gradient(180deg, rgba(28, 28, 23, 0.88), rgba(19, 19, 16, 0.66));
+      box-shadow: var(--shadow);
+    }
+    .sidebar::before, .desk::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(232, 228, 216, 0.3), transparent);
+      pointer-events: none;
+    }
+    .sidebar { position: sticky; top: 18px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; min-height: 64px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+    .panel-title { margin: 0; font: 400 1.45rem var(--display); }
+    .panel-kicker { color: var(--signal-dark); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .sidebar-body { padding: 20px 18px 24px; }
+    .security-note { display: flex; gap: 10px; padding: 12px; margin: 4px 0 20px; color: var(--muted); background: var(--paper-deep); border: 1px solid var(--line); font-size: 0.76rem; line-height: 1.5; }
+    .security-note .icon { margin-top: 2px; }
+    .key-wrap { position: relative; }
+    .key-wrap input { padding-right: 48px; }
+    .icon-button { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; cursor: pointer; }
+    .key-wrap .icon-button { position: absolute; top: 4px; right: 3px; }
+    .sidebar-status { display: flex; justify-content: space-between; gap: 12px; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.74rem; }
+    .status-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--sage); }
+
+    .desk { min-width: 0; }
+    .tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line-strong); scrollbar-width: thin; }
+    .tab {
+      min-width: max-content;
+      padding: 20px 22px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      color: var(--muted);
+      background: transparent;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .tab:hover { color: var(--ink); background: rgba(30, 30, 25, 0.5); }
+    .tab.active {
+      color: var(--paper);
+      background: linear-gradient(135deg, var(--ink), #d8d2c2);
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    }
+    .tab-panel { display: none; padding: clamp(22px, 4vw, 48px); animation: reveal 280ms ease both; }
+    .tab-panel.active { display: block; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
+    .section-intro {
+      display: grid;
+      grid-template-columns: 1fr minmax(250px, 0.55fr);
+      gap: 30px;
+      align-items: end;
+      margin-bottom: 34px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(34, 33, 28, 0.84), rgba(24, 24, 20, 0.64));
+      box-shadow: var(--shadow-soft);
+    }
+    .section-intro h2 { margin: 0; font: 400 clamp(2.25rem, 5vw, 4.4rem)/0.98 var(--display); letter-spacing: -0.04em; }
+    .section-intro p { margin: 0; color: var(--muted); line-height: 1.65; }
+    .template-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+    .template-card {
+      grid-column: span 4;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      border: 1px solid var(--line-strong);
+      text-align: left;
+      background: var(--white);
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, color 160ms ease, background 160ms ease;
+    }
+    .template-card:nth-child(1), .template-card:nth-child(6) { grid-column: span 8; }
+    .template-card:hover { z-index: 1; color: var(--white); background: var(--signal); transform: translate(-4px, -4px); box-shadow: 7px 7px 0 var(--ink); }
+    .template-index { color: var(--muted); font: italic 0.85rem var(--display); }
+    .template-card:hover .template-index { color: rgba(255,255,255,.68); }
+    .template-name { font: 400 clamp(1.3rem, 2vw, 1.8rem) var(--display); }
+
+    .editor-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 26px; }
+    .editor-main {
+      padding: clamp(18px, 2.2vw, 28px);
+      border: 1px solid var(--line-strong);
+      background: linear-gradient(180deg, rgba(34, 33, 28, 0.92), rgba(24, 24, 20, 0.82));
+      box-shadow: var(--shadow-soft);
+    }
+    .evidence-card { padding: 18px; border: 1px solid var(--line-strong); background: linear-gradient(180deg, rgba(26, 26, 21, 0.95), rgba(20, 20, 17, 0.88)); box-shadow: var(--shadow-soft); }
+    .evidence-card h3 { margin: 0 0 8px; font: 400 1.5rem var(--display); }
+    .evidence-card > p { margin: 0 0 16px; color: var(--muted); font-size: 0.8rem; line-height: 1.55; }
+    .check-item { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 0.84rem; }
+    .check-item input { margin-top: 1px; flex: 0 0 auto; }
+    .check-item label { margin: 0; color: inherit; font-size: inherit; font-weight: 500; letter-spacing: 0; line-height: 1.45; text-transform: none; }
+    .action-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .tool-card {
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line-strong);
+      background: linear-gradient(180deg, rgba(30, 30, 25, 0.9), rgba(22, 22, 18, 0.82));
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+    .tool-card:hover { transform: translate(-2px, -2px); border-color: rgba(201, 90, 64, 0.5); box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.28); }
+    .tool-card:disabled { opacity: 0.58; cursor: wait; transform: none; box-shadow: none; }
+    .tool-card-top { display: flex; align-items: center; gap: 10px; color: var(--signal-dark); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-card h4 { margin: 0; font: 400 1.45rem/1.05 var(--display); }
+    .tool-card p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
+    .tool-result {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid var(--line-strong);
+      background: rgba(19, 19, 16, 0.7);
+    }
+    .tool-result-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .tool-result-title { font: 400 1.15rem var(--display); }
+    .tool-pill {
+      padding: 6px 10px;
+      color: var(--signal-dark);
+      background: var(--signal-soft);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .tool-result-box {
+      min-height: 140px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: rgba(30, 30, 25, 0.55);
+      color: var(--ink);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+    .tool-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .tool-loading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: rgba(19, 19, 16, 0.72);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .tool-loading .loading-lines { width: 28px; }
+    .tool-loading .loading-lines span { height: 1.5px; }
+
+    .suggestion-list { display: grid; gap: 10px; }
+    .suggestion {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 17px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      cursor: pointer;
+    }
+    .suggestion:hover { border-color: var(--signal); }
+    .suggestion-num { color: var(--signal); font: italic 1.35rem var(--display); }
+    .suggestion-text { line-height: 1.5; text-align: left; }
+    .suggestion .icon { color: var(--muted); }
+
+    .history-list { display: grid; gap: 12px; }
+    .empty-state { padding: 60px 24px; border: 1px dashed var(--line-strong); text-align: center; }
+    .empty-state h3 { margin: 0 0 8px; font: 400 2rem var(--display); }
+    .empty-state p { margin: 0; color: var(--muted); }
+    .history-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; padding: 18px; border: 1px solid var(--line); background: var(--white); }
+    .history-category { margin-bottom: 6px; color: var(--signal-dark); font: 400 1.35rem var(--display); }
+    .history-problem { color: var(--ink-soft); font-size: 0.86rem; line-height: 1.55; }
+    .history-date { margin-top: 10px; color: var(--muted); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .history-actions { display: flex; gap: 8px; align-items: center; }
+
+    .custom-list { display: grid; gap: 10px; margin-top: 28px; }
+    .custom-item { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 15px; border: 1px solid var(--line); background: var(--white); }
+    .custom-item strong { display: block; margin-bottom: 5px; font: 400 1.25rem var(--display); }
+    .custom-item p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    .chat-panel { display: none; margin-top: 22px; border: 1px solid var(--line-strong); background: rgba(19, 19, 16, 0.55); }
+    .chat-panel.visible { display: block; animation: reveal 280ms ease both; }
+    .chat-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .chat-title { font: 400 1.2rem var(--display); }
+    .chat-hint { color: var(--muted); font-size: 0.74rem; }
+    .chat-messages { max-height: 280px; overflow-y: auto; padding: 16px 18px; display: grid; gap: 12px; scrollbar-width: thin; }
+    .chat-msg { max-width: 85%; padding: 12px 15px; font-size: 0.88rem; line-height: 1.6; border: 1px solid var(--line); background: var(--white); }
+    .chat-msg.user { justify-self: end; background: var(--signal); color: var(--paper); border-color: var(--signal); }
+    .chat-msg.assistant { justify-self: start; }
+    .chat-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); }
+    .chat-input-row { display: flex; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); }
+    .chat-input { flex: 1; min-height: 42px; height: 42px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 0; background: rgba(19, 19, 16, 0.6); color: var(--ink); font-size: 0.86rem; }
+    .chat-input:focus { border-color: var(--signal); background: var(--paper-deep); box-shadow: 5px 5px 0 rgba(201, 90, 64, 0.15); outline: none; }
+    .chat-loading { display: flex; align-items: center; gap: 10px; padding: 12px 15px; color: var(--muted); font-size: 0.84rem; }
+    .chat-loading .loading-lines { width: 28px; }
+    .chat-loading .loading-lines span { height: 1.5px; }
+    .chat-loading.visible { display: flex; }
+
+    .loading { display: none; align-items: center; gap: 14px; padding: 18px; margin-top: 18px; color: var(--muted); border: 1px solid var(--line); background: var(--paper-deep); }
+    .loading.active { display: flex; }
+    .loading-lines { width: 42px; display: grid; gap: 4px; }
+    .loading-lines span { height: 2px; background: var(--signal); transform-origin: left; animation: scan 900ms ease-in-out infinite alternate; }
+    .loading-lines span:nth-child(2) { animation-delay: 130ms; }
+    .loading-lines span:nth-child(3) { animation-delay: 260ms; }
+    @keyframes scan { from { transform: scaleX(.2); opacity: .35; } to { transform: scaleX(1); opacity: 1; } }
+
+    .output { display: none; margin-top: 26px; border: 1px solid var(--line-strong); background: var(--white); }
+    .output.visible { display: block; animation: reveal 300ms ease both; }
+    .output-head { display: flex; justify-content: space-between; gap: 18px; align-items: center; padding: 16px 18px; color: var(--ink); background: var(--paper-deep); border-bottom: 1px solid var(--line); }
+    .category { color: var(--signal); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .output-body { padding: clamp(22px, 4vw, 38px); }
+    .output-copy { min-height: 180px; padding: 0; border: 0; background: transparent; color: var(--ink); font: 400 1.08rem/1.8 var(--display); box-shadow: none; }
+    .output-copy:focus { box-shadow: none; }
+
+    .upload-section { margin: 18px 0; }
+    .upload-area { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px dashed var(--line-strong); background: rgba(19, 19, 16, 0.35); cursor: pointer; }
+    .upload-area:hover { border-color: var(--signal); }
+    .upload-hint { color: var(--muted); font-size: 0.76rem; }
+    .upload-preview { display: flex; gap: 14px; padding: 14px; border: 1px solid var(--line-strong); background: var(--paper-deep); }
+    .upload-preview img { max-width: 120px; max-height: 90px; object-fit: cover; border: 1px solid var(--line); }
+    .upload-preview-body { display: flex; flex-direction: column; justify-content: center; gap: 10px; flex: 1; min-width: 0; }
+    .upload-filename { color: var(--muted); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .upload-preview-actions { display: flex; gap: 8px; }
+    .upload-loading { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid var(--line); background: var(--paper-deep); color: var(--muted); font-size: 0.84rem; }
+    .upload-loading .loading-lines { width: 28px; }
+    .upload-loading .loading-lines span { height: 1.5px; }
+
+    .toast-region { position: fixed; right: 22px; bottom: 22px; z-index: 30; display: grid; gap: 10px; width: min(360px, calc(100vw - 44px)); }
+    .toast { padding: 15px 17px; color: var(--ink); background: var(--paper-deep); border-left: 4px solid var(--sage); box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.35); animation: toast-in 240ms ease both; font-size: 0.84rem; line-height: 1.45; }
+    .toast.error { border-left-color: var(--signal); }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 1050px) {
+      .login-screen { grid-template-columns: 1fr; }
+      .login-story { min-height: 55vh; }
+      .login-panel { min-height: 45vh; }
+      .workspace { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .sidebar-body { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 18px; }
+      .security-note, .sidebar-status { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { grid-template-columns: 1fr auto; }
+      .topbar-center { display: none; }
+      .hero, .section-intro, .editor-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 58px; }
+      .hero h1 { font-size: clamp(3.2rem, 19vw, 6rem); }
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .stat:nth-child(2) { border-right: 0; }
+      .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .template-card, .template-card:nth-child(1), .template-card:nth-child(6) { grid-column: span 6; }
+      .field-row, .sidebar-body { grid-template-columns: 1fr; }
+      .security-note, .sidebar-status { grid-column: auto; }
+      .section-intro { gap: 12px; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .upload-area { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .upload-preview { flex-direction: column; }
+      .upload-preview img { max-width: 100%; max-height: 140px; }
+    }
+
+    @media (max-width: 500px) {
+      .login-story { min-height: 48vh; padding: 30px 22px; }
+      .login-panel { padding: 40px 22px; }
+      .app-shell { padding-inline: 12px; }
+      .topbar .brand-mark::before { display: none; }
+      .topbar-actions .button span { display: none; }
+      .stats-strip { grid-template-columns: 1fr; }
+      .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+      .stat:last-child { border-bottom: 0; }
+      .template-card, .template-card:nth-child(1), .template-card:nth-child(6) { grid-column: span 12; }
+      .tab-panel { padding-inline: 16px; }
+      .history-card { grid-template-columns: 1fr; }
+      .history-actions { justify-content: flex-start; }
+      .suggestion { grid-template-columns: 34px 1fr; }
+      .suggestion .icon { display: none; }
+      .chat-actions { gap: 6px; }
+      .chat-msg { max-width: 95%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-8h8v8"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></symbol>
+    <symbol id="i-translate" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 9c1.4 3 3.4 5.2 6.2 6.8M11.5 8c-1.2 3.4-3.5 6.1-7 8M14 21l4-10 4 10M15.5 17h5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M19 3v4M21 5h-4M5 17v4M7 19H3"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></symbol>
+  </svg>
+
+  <main class="login-screen" id="loginPanel">
+    <section class="login-story">
+      <div class="brand-mark">Casefile / 01</div>
+      <div class="story-copy">
+        <h1>Turn the incident into a <em>clear record.</em></h1>
+        <p>Organize the facts, preserve the evidence, and prepare a concise message for Instagram Support without losing the details that matter.</p>
+      </div>
+      <div class="story-foot">PRIVATE WORKSPACE · STORED ON THIS DEVICE</div>
+    </section>
+    <section class="login-panel">
+      <form class="login-card" onsubmit="handleLogin(event)">
+        <div class="eyebrow">Secure desk</div>
+        <h2>Open your file.</h2>
+        <p>Sign in to continue to your private report workspace.</p>
+        <div class="field">
+          <label for="usernameInput">Username</label>
+          <input id="usernameInput" name="username" autocomplete="username" placeholder="Your username" required>
+        </div>
+        <div class="field">
+          <label for="passwordInput">Password</label>
+          <input id="passwordInput" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+        </div>
+        <div class="check-line">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Remember my username on this device</label>
+        </div>
+        <button class="button primary full" type="submit">Enter workspace <svg class="icon"><use href="#i-arrow"/></svg></button>
+        <div class="login-error" id="loginError" role="alert" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <main class="app" id="appContainer">
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-mark">Casefile</div>
+        <div class="topbar-center">A calmer way to report what happened.</div>
+        <div class="topbar-actions">
+          <button class="button ghost small" type="button" onclick="saveDraft()"><svg class="icon"><use href="#i-save"/></svg><span>Save draft</span></button>
+          <button class="button ghost small" type="button" onclick="handleLogout()"><span>Close desk</span></button>
+        </div>
+      </header>
+
+      <section class="hero">
+        <h1>Build a report that stays <span>on record.</span></h1>
+        <div class="hero-aside">
+          <p>Start from a common incident or write from scratch. Casefile turns your notes into a focused support message while keeping the facts in your control.</p>
+          <div class="hero-badges">
+            <span class="hero-badge">Private local drafts</span>
+            <span class="hero-badge">Screenshot reading</span>
+            <span class="hero-badge">Refine before sending</span>
+          </div>
+          <div class="progress-line" aria-label="Report workflow">
+            <div class="progress-step active" id="step1">01 · Describe</div>
+            <div class="progress-step" id="step2">02 · Review</div>
+            <div class="progress-step" id="step3">03 · Record</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-strip" aria-label="Workspace statistics">
+        <div class="stat"><span class="stat-value" id="reportCount">0</span><span class="stat-label">Reports generated</span></div>
+        <div class="stat"><span class="stat-value" id="templateCount">6</span><span class="stat-label">Ready templates</span></div>
+        <div class="stat"><span class="stat-value" id="savedDrafts">0</span><span class="stat-label">Active draft</span></div>
+        <div class="stat"><span class="stat-value" id="historyCount">0</span><span class="stat-label">Filed reports</span></div>
+      </section>
+
+      <section class="workspace">
+        <aside class="sidebar">
+          <div class="panel-head"><h2 class="panel-title">Desk setup</h2><span class="panel-kicker">Private</span></div>
+          <div class="sidebar-body">
+            <div class="field">
+              <label for="apiKey">Groq API key</label>
+              <div class="key-wrap">
+                <input type="password" id="apiKey" autocomplete="off" placeholder="gsk_••••••••••••">
+                <button class="icon-button" type="button" onclick="toggleKey()" aria-label="Show or hide API key"><svg class="icon"><use href="#i-eye"/></svg></button>
+              </div>
+            </div>
+            <div class="security-note"><svg class="icon"><use href="#i-lock"/></svg><span>Your key stays in this browser session and is sent directly to Groq only when generating a report.</span></div>
+            <div class="field">
+              <label for="model">Writing model</label>
+              <select id="model">
+                <option value="openai/gpt-oss-120b">GPT OSS 120B</option>
+                <option value="meta-llama/llama-4-scout-17b-16e-instruct">Llama 4 Scout 17B (Vision)</option>
+                <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="urgency">Urgency</label>
+              <select id="urgency">
+                <option value="normal">Standard review</option>
+                <option value="high">Urgent review</option>
+                <option value="critical">Immediate safety concern</option>
+              </select>
+            </div>
+            <div class="sidebar-status"><span><span class="status-dot"></span>Draft autosave ready</span><span id="draftStatus">Not saved</span></div>
+          </div>
+        </aside>
+
+        <div class="desk">
+          <nav class="tabs" aria-label="Report workspace">
+            <button class="tab active" type="button" data-tab="templates" onclick="switchTab('templates', this)">Starting points</button>
+            <button class="tab" type="button" data-tab="editor" onclick="switchTab('editor', this)">Write report</button>
+            <button class="tab" type="button" data-tab="suggestions" onclick="switchTab('suggestions', this)">Evidence prompts</button>
+            <button class="tab" type="button" data-tab="tracker" onclick="switchTab('tracker', this)">Filed reports</button>
+            <button class="tab" type="button" data-tab="custom" onclick="switchTab('custom', this)">My templates</button>
+          </nav>
+
+          <section class="tab-panel active" id="tab-templates">
+            <div class="section-intro"><h2>What happened?</h2><p>Choose the closest starting point. You can revise every word before anything is generated.</p></div>
+            <div class="template-grid" id="templateGrid"></div>
+          </section>
+
+          <section class="tab-panel" id="tab-editor">
+            <div class="section-intro"><h2>Write the facts first.</h2><p>Describe only what you observed. Specific dates, account names, messages, and actions make reports easier to review.</p></div>
+            <div class="editor-grid">
+              <div class="editor-main">
+                <div class="field-row">
+                  <div class="field"><label for="reportUsername">Account involved</label><input id="reportUsername" placeholder="@username" autocomplete="off"></div>
+                  <div class="field"><label for="incidentDate">Incident date</label><input type="date" id="incidentDate"></div>
+                </div>
+                <div class="field">
+                  <div class="field-head"><label for="problem">Incident notes</label><span class="char-count"><span id="charCount">0</span> characters</span></div>
+                  <textarea id="problem" placeholder="Describe what happened, when it happened, and which content or messages are involved..."></textarea>
+                </div>
+                <div class="upload-section" id="uploadSection">
+                  <div class="upload-area" id="uploadArea">
+                    <input type="file" id="screenshotInput" accept="image/png,image/jpeg,image/webp" hidden>
+                    <button class="button ghost" type="button" onclick="document.getElementById('screenshotInput').click()">
+                      <svg class="icon" viewBox="0 0 24 24" width="18" height="18"><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 16l5-4 3 2 4-4 6 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                      Upload screenshot
+                    </button>
+                    <span class="upload-hint">PNG or JPG — the AI reads the conversation</span>
+                  </div>
+                  <div class="upload-preview" id="uploadPreview" hidden>
+                    <img id="previewImage" alt="Screenshot preview">
+                    <div class="upload-preview-body">
+                      <span class="upload-filename" id="uploadFilename"></span>
+                      <div class="upload-preview-actions">
+                        <button class="button small ghost" type="button" onclick="clearUpload()">Remove</button>
+                        <button class="button primary small" type="button" onclick="analyzeScreenshot()">Analyze with AI</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="upload-loading" id="uploadLoading" hidden>
+                    <div class="loading-lines"><span></span><span></span><span></span></div>
+                    <span>Reading the screenshot and extracting details…</span>
+                  </div>
+                </div>
+                <div class="tool-grid">
+                  <button class="tool-card" type="button" onclick="runAssistTool('facts')">
+                    <span class="tool-card-top"><svg class="icon"><use href="#i-spark"/></svg>Quick tool</span>
+                    <div>
+                      <h4>Fact cleaner</h4>
+                      <p>Turn messy notes into short factual bullets without the extra noise.</p>
+                    </div>
+                  </button>
+                  <button class="tool-card" type="button" onclick="runAssistTool('timeline')">
+                    <span class="tool-card-top"><svg class="icon"><use href="#i-list"/></svg>Quick tool</span>
+                    <div>
+                      <h4>Timeline builder</h4>
+                      <p>Arrange what happened into a compact step-by-step sequence you can reuse.</p>
+                    </div>
+                  </button>
+                </div>
+                <div class="tool-loading" id="toolLoading" hidden>
+                  <div class="loading-lines"><span></span><span></span><span></span></div>
+                  <span id="toolLoadingText">Preparing your draft tool...</span>
+                </div>
+                <div class="tool-result" id="toolResult" hidden>
+                  <div class="tool-result-head">
+                    <span class="tool-result-title" id="toolResultTitle">Tool output</span>
+                    <span class="tool-pill">Ready to use</span>
+                  </div>
+                  <textarea class="tool-result-box" id="toolResultBox"></textarea>
+                  <div class="tool-toolbar">
+                    <button class="button dark small" type="button" onclick="insertToolResult()"><svg class="icon"><use href="#i-save"/></svg>Use in notes</button>
+                    <button class="button ghost small" type="button" onclick="copyToolResult()"><svg class="icon"><use href="#i-copy"/></svg>Copy tool text</button>
+                  </div>
+                </div>
+                <div class="action-row">
+                  <button class="button ghost" type="button" id="translateButton" onclick="translateProblem()"><svg class="icon"><use href="#i-translate"/></svg>Translate to English</button>
+                  <button class="button primary" type="button" id="generateButton" onclick="generateReport()">Generate report <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+                <div class="loading" id="loadingBar" role="status"><div class="loading-lines"><span></span><span></span><span></span></div><span>Reviewing the details and drafting a concise message…</span></div>
+              </div>
+              <aside class="evidence-card">
+                <h3>Evidence check</h3>
+                <p>Keep original evidence available even if you do not attach it immediately.</p>
+                <div class="check-item"><input type="checkbox" id="evidence1"><label for="evidence1">Screenshots preserve the full screen and account name</label></div>
+                <div class="check-item"><input type="checkbox" id="evidence2"><label for="evidence2">Dates and timestamps are visible or written down</label></div>
+                <div class="check-item"><input type="checkbox" id="evidence3"><label for="evidence3">Profile and content links are saved separately</label></div>
+                <div class="check-item"><input type="checkbox" id="evidence4"><label for="evidence4">No facts are exaggerated or assumed</label></div>
+              </aside>
+            </div>
+
+            <article class="output" id="outputCard">
+              <div class="output-head"><span>Prepared support message</span><span class="category" id="categoryBox"></span></div>
+              <div class="output-body">
+                <label for="outputBox">Review and edit before sending</label>
+                <textarea class="output-copy" id="outputBox"></textarea>
+                <div class="action-row">
+                  <button class="button dark" type="button" onclick="copyMessage()"><svg class="icon"><use href="#i-copy"/></svg>Copy</button>
+                  <button class="button ghost" type="button" onclick="exportReport()"><svg class="icon"><use href="#i-download"/></svg>Export text</button>
+                  <button class="button ghost" type="button" onclick="saveReportToHistory()"><svg class="icon"><use href="#i-save"/></svg>File report</button>
+                </div>
+              </div>
+            </article>
+
+            <div class="chat-panel" id="chatPanel">
+              <div class="chat-head">
+                <span class="chat-title">Refine this report</span>
+                <span class="chat-hint">Ask the AI to adjust tone, add detail, or simplify</span>
+              </div>
+              <div class="chat-messages" id="chatMessages"></div>
+              <div class="chat-actions">
+                <button class="button small ghost" type="button" onclick="refineChat('Make the tone more formal and authoritative')">More formal</button>
+                <button class="button small ghost" type="button" onclick="refineChat('Add a stronger sense of urgency to the message')">Add urgency</button>
+                <button class="button small ghost" type="button" onclick="refineChat('Simplify the language so anyone can understand it')">Simplify</button>
+                <button class="button small ghost" type="button" onclick="refineChat('Shorten the report to 2-3 sentences maximum')">Shorten</button>
+              </div>
+              <div class="chat-input-row">
+                <input type="text" id="chatInput" class="chat-input" placeholder="e.g. Make it more polite, mention the specific date, add a safety concern...">
+                <button class="button primary small" type="button" id="chatSendBtn" onclick="refineChat(document.getElementById('chatInput').value)">
+                  <svg class="icon"><use href="#i-arrow"/></svg>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="tab-panel" id="tab-suggestions">
+            <div class="section-intro"><h2>Add the detail reviewers need.</h2><p>Select a prompt to add it to your notes, then replace the brackets with accurate information.</p></div>
+            <div class="suggestion-list" id="suggestionList"></div>
+          </section>
+
+          <section class="tab-panel" id="tab-tracker">
+            <div class="section-intro"><h2>Your filed reports.</h2><p>Reopen a previous report, reuse its structure, or remove records you no longer need.</p></div>
+            <div class="history-list" id="historyList"></div>
+          </section>
+
+          <section class="tab-panel" id="tab-custom">
+            <div class="section-intro"><h2>Save your own starting point.</h2><p>Create a reusable prompt for incidents you need to document more than once.</p></div>
+            <div class="field"><label for="customName">Template name</label><input id="customName" placeholder="Example: Repeated unwanted contact"></div>
+            <div class="field"><label for="customContent">Starting notes</label><textarea id="customContent" placeholder="Write the reusable facts or structure here..."></textarea></div>
+            <button class="button primary" type="button" onclick="saveCustomTemplate()"><svg class="icon"><use href="#i-save"/></svg>Save template</button>
+            <div class="custom-list" id="customList"></div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const defaultTemplates = [
+      { name: 'Threats or intimidation', text: 'I received threatening messages from an account. The messages were sent on [date/time] and included [brief factual description].' },
+      { name: 'Impersonation', text: 'An account is pretending to be me or someone I represent. It is using [name/photos/details] without permission and may be misleading other people.' },
+      { name: 'Spam contact', text: 'I am receiving repeated unwanted messages or comments from this account. The contact began on [date] and has continued after [action taken].' },
+      { name: 'Counterfeit goods', text: 'This account appears to be selling counterfeit products using [brand or product details]. The relevant posts or profile links are [links].' },
+      { name: 'Bullying or harassment', text: 'I am being targeted by repeated bullying or harassment. The behavior includes [specific words or actions] and occurred on [dates].' },
+      { name: 'Wrongful restriction', text: 'I believe an account or action was restricted by mistake. The restriction occurred on [date], and the reason it may be incorrect is [factual explanation].' }
+    ];
+
+    const suggestions = [
+      'The incident occurred on [date] at approximately [time and time zone].',
+      'The exact account username and profile link are [username and link].',
+      'The specific post, story, comment, or message link is [link].',
+      'I already used Instagram’s in-app reporting option on [date].',
+      'The behavior has happened [number] times since [date].',
+      'The immediate safety concern is [brief, factual description].'
+    ];
+
+    const assistToolPrompts = {
+      facts: {
+        title: 'Fact cleaner',
+        prompt: `Rewrite the user's notes as 3 to 6 short factual bullet points.
+
+Rules:
+- Keep only what is directly seen or clearly stated.
+- Remove extra wording and keep each bullet short.
+- Avoid names, usernames, dates, and timestamps unless they are essential to understand the event.
+- No headings, no intro, no conclusion.`
+      },
+      timeline: {
+        title: 'Timeline builder',
+        prompt: `Turn the user's notes into a compact timeline.
+
+Rules:
+- Write 2 to 5 short lines only.
+- Keep the order of events clear.
+- Use simple sequence wording like "First", "Then", "Later", "After that" if needed.
+- Avoid names, usernames, dates, and timestamps unless they are essential.
+- No headings or extra explanation.`
+      }
+    };
+
+    const systemPrompt = `You are a professional incident-report writer for Instagram Support. Your task: analyze the user's description and produce a concise, factual support message.
+
+CATEGORIES (pick the single best match):
+- "Recent messages they sent you" — unwanted or harmful messages from another account
+- "They are pretending to be someone else" — impersonation or identity misuse
+- "They may be under the minimum age" — suspected underage user
+- "It may have been hacked" — unauthorized access, compromised account
+- "Something else" — does not fit any other category
+- "Spam" — repeated unsolicited content, bot behavior, fake engagement
+- "Scam or fraud" — phishing, financial fraud, deceptive schemes
+- "Bullying or harassment" — targeted personal attacks, intimidation, threats
+- "Hate speech or symbols" — slurs, discriminatory content, extremist symbols
+- "Violence or dangerous organizations" — threats of harm, promotion of violence, extremist groups
+- "Selling illegal or regulated goods" — drugs, weapons, counterfeit items, restricted products
+- "Nudity or sexual activity" — explicit content, non-consensual imagery
+- "Intellectual property violation" — copyright or trademark infringement
+
+RULES:
+1. Write in the user's first-person voice, in English.
+2. Tone: firm but professional. If urgency is "critical" (safety concern), convey immediacy. If "high", convey urgency. Otherwise use a calm, standard tone.
+3. Structure: brief greeting → 1–3 factual sentences describing the incident → clear statement of requested action → thanks → sign-off.
+4. Do NOT invent details, exaggerate, or mention AI in any way.
+5. Do NOT use filler phrases like "I hope this message finds you well" or "Thank you for your time and consideration."
+6. Keep the total message between 50 and 200 words.
+7. If the user provided evidence checklist items, reference that evidence is available upon request.
+
+OUTPUT FORMAT (strict — no extra text):
+CATEGORY: [exact category name from the list above]
+REPORT: [the complete support message]`;
+
+    let history = readStorage('reportHistory', []);
+    let customTemplates = readStorage('customTemplates', []);
+    let reportCount = Number(localStorage.getItem('reportCount') || 0);
+    let currentReport = null;
+    let currentToolResult = '';
+    let chatHistory = [];
+    let draftTimer;
+
+    function readStorage(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch { return fallback; }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      localStorage.removeItem('groqApiKey');
+      const rememberedUser = localStorage.getItem('rememberedUser');
+      if (rememberedUser) {
+        document.getElementById('usernameInput').value = rememberedUser;
+        document.getElementById('rememberMe').checked = true;
+      }
+      if (sessionStorage.getItem('isLoggedIn') === 'true') showApp();
+      document.getElementById('model').value = localStorage.getItem('groqModel') || 'openai/gpt-oss-120b';
+      document.getElementById('apiKey').value = sessionStorage.getItem('groqApiKey') || '';
+      loadDraft();
+      renderTemplates();
+      renderSuggestions();
+      renderHistory();
+      renderCustomTemplates();
+      updateStats();
+
+      ['problem', 'reportUsername', 'incidentDate', 'urgency'].forEach(id => {
+        document.getElementById(id).addEventListener('input', handleDraftInput);
+        document.getElementById(id).addEventListener('change', handleDraftInput);
+      });
+      document.getElementById('problem').addEventListener('input', updateCharacterCount);
+      document.getElementById('chatInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); refineChat(document.getElementById('chatInput').value); }
+      });
+      document.getElementById('screenshotInput').addEventListener('change', handleScreenshotSelect);
+    });
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const error = document.getElementById('loginError');
+      if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('rememberMe').checked ? localStorage.setItem('rememberedUser', username) : localStorage.removeItem('rememberedUser');
+        error.textContent = '';
+        showApp();
+      } else {
+        error.textContent = 'Those credentials do not match this workspace.';
+      }
+    }
+
+    function showApp() {
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('appContainer').style.display = 'block';
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('groqApiKey');
+      document.getElementById('apiKey').value = '';
+      document.getElementById('appContainer').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'grid';
+      document.getElementById('passwordInput').value = '';
+    }
+
+    function switchTab(name, trigger) {
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(`tab-${name}`).classList.add('active');
+      (trigger || document.querySelector(`[data-tab="${name}"]`)).classList.add('active');
+      if (name === 'editor') setProgress(1);
+      if (name === 'tracker') setProgress(3);
+    }
+
+    function setProgress(step) {
+      document.querySelectorAll('.progress-step').forEach((item, index) => item.classList.toggle('active', index < step));
+    }
+
+    function renderTemplates() {
+      document.getElementById('templateGrid').innerHTML = defaultTemplates.map((template, index) => `
+        <button class="template-card" type="button" onclick="useTemplate(${index})">
+          <span class="template-index">0${index + 1}</span><span class="template-name">${escapeHtml(template.name)}</span>
+        </button>`).join('');
+    }
+
+    function useTemplate(index, custom = false) {
+      const template = custom ? customTemplates[index] : defaultTemplates[index];
+      document.getElementById('problem').value = custom ? template.content : template.text;
+      updateCharacterCount();
+      handleDraftInput();
+      switchTab('editor');
+      document.getElementById('problem').focus();
+      showToast(`${template.name} loaded. Add the exact details before generating.`);
+    }
+
+    function renderSuggestions() {
+      document.getElementById('suggestionList').innerHTML = suggestions.map((text, index) => `
+        <button class="suggestion" type="button" onclick="addSuggestion(${index})">
+          <span class="suggestion-num">0${index + 1}</span><span class="suggestion-text">${escapeHtml(text)}</span><svg class="icon"><use href="#i-arrow"/></svg>
+        </button>`).join('');
+    }
+
+    function addSuggestion(index) {
+      const problem = document.getElementById('problem');
+      problem.value = `${problem.value}${problem.value.trim() ? '\n\n' : ''}${suggestions[index]}`;
+      updateCharacterCount();
+      handleDraftInput();
+      switchTab('editor');
+      problem.focus();
+    }
+
+    function handleDraftInput() {
+      document.getElementById('draftStatus').textContent = 'Editing…';
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(() => saveDraft(false), 700);
+    }
+
+    function getDraft() {
+      return {
+        problem: document.getElementById('problem').value,
+        username: document.getElementById('reportUsername').value,
+        incidentDate: document.getElementById('incidentDate').value,
+        urgency: document.getElementById('urgency').value,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function saveDraft(notify = true) {
+      const draft = getDraft();
+      if (!draft.problem.trim() && !draft.username.trim() && !draft.incidentDate) {
+        if (notify) showToast('Add some report details before saving.', true);
+        return;
+      }
+      localStorage.setItem('reportDraft', JSON.stringify(draft));
+      document.getElementById('draftStatus').textContent = 'Saved now';
+      updateStats();
+      if (notify) showToast('Draft saved on this device.');
+    }
+
+    function loadDraft() {
+      const draft = readStorage('reportDraft', null);
+      if (!draft) return;
+      document.getElementById('problem').value = draft.problem || '';
+      document.getElementById('reportUsername').value = draft.username || '';
+      document.getElementById('incidentDate').value = draft.incidentDate || '';
+      document.getElementById('urgency').value = draft.urgency || 'normal';
+      document.getElementById('draftStatus').textContent = 'Draft restored';
+      updateCharacterCount();
+    }
+
+    function updateCharacterCount() {
+      document.getElementById('charCount').textContent = document.getElementById('problem').value.length;
+    }
+
+    function updateStats() {
+      document.getElementById('reportCount').textContent = reportCount;
+      document.getElementById('templateCount').textContent = defaultTemplates.length + customTemplates.length;
+      document.getElementById('savedDrafts').textContent = localStorage.getItem('reportDraft') ? 1 : 0;
+      document.getElementById('historyCount').textContent = history.length;
+    }
+
+    function toggleKey() {
+      const input = document.getElementById('apiKey');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    async function generateReport() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const model = document.getElementById('model').value;
+      const rawProblem = document.getElementById('problem').value.trim();
+      const username = document.getElementById('reportUsername').value.trim();
+      const incidentDate = document.getElementById('incidentDate').value;
+      const urgency = document.getElementById('urgency').value;
+      const loading = document.getElementById('loadingBar');
+      const button = document.getElementById('generateButton');
+
+      if (!apiKey) return showToast('Add your Groq API key in Desk setup.', true);
+      if (rawProblem.length < 20) return showToast('Add a little more detail before generating the report.', true);
+
+      sessionStorage.setItem('groqApiKey', apiKey);
+      localStorage.setItem('groqModel', model);
+      let problem = rawProblem;
+      if (username) problem += `\nAccount involved: ${username}`;
+      if (incidentDate) problem += `\nIncident date: ${incidentDate}`;
+      if (urgency !== 'normal') problem += `\nUrgency level: ${urgency}`;
+      const evidenceItems = [];
+      if (document.getElementById('evidence1').checked) evidenceItems.push('Full-screen screenshots available');
+      if (document.getElementById('evidence2').checked) evidenceItems.push('Timestamps documented');
+      if (document.getElementById('evidence3').checked) evidenceItems.push('Profile/content links saved');
+      if (document.getElementById('evidence4').checked) evidenceItems.push('All facts verified as accurate');
+      if (evidenceItems.length) problem += `\nEvidence prepared: ${evidenceItems.join('; ')}`;
+      const userMessage = problem;
+
+      loading.classList.add('active');
+      button.disabled = true;
+      document.getElementById('outputCard').classList.remove('visible');
+      document.getElementById('chatPanel').classList.remove('visible');
+      chatHistory = [];
+
+      try {
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ];
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({ model, messages, temperature: 0.35, max_tokens: 700 })
+        });
+        if (!response.ok) {
+          const message = response.status === 401 ? 'The API key was not accepted.' : `Groq returned an error (${response.status}).`;
+          throw new Error(message);
+        }
+        const data = await response.json();
+        const content = data?.choices?.[0]?.message?.content?.trim();
+        if (!content) throw new Error('No report text was returned.');
+
+        let category = 'Something else';
+        let reportMessage = content;
+        const catMatch = content.match(/^CATEGORY:\s*(.+)$/m);
+        const repMatch = content.match(/^REPORT:\s*([\s\S]+)$/m);
+        if (catMatch && repMatch) {
+          category = catMatch[1].trim();
+          reportMessage = repMatch[1].trim();
+        } else {
+          const lines = content.split('\n');
+          category = lines[0].trim();
+          reportMessage = lines.slice(1).join('\n').trim();
+        }
+        if (!reportMessage) throw new Error('The generated report was incomplete.');
+
+        currentReport = { category, message: reportMessage, timestamp: new Date().toISOString(), status: 'draft' };
+        chatHistory = [{ role: 'user', content: userMessage }, { role: 'assistant', content: reportMessage }];
+
+        document.getElementById('categoryBox').textContent = currentReport.category;
+        document.getElementById('outputBox').value = currentReport.message;
+        document.getElementById('outputCard').classList.add('visible');
+        document.getElementById('chatPanel').classList.add('visible');
+        renderChatMessages();
+        reportCount += 1;
+        localStorage.setItem('reportCount', String(reportCount));
+        updateStats();
+        setProgress(2);
+        document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showToast('Report prepared. Review every detail before sending.');
+      } catch (error) {
+        showToast(error.message || 'The report could not be generated.', true);
+      } finally {
+        loading.classList.remove('active');
+        button.disabled = false;
+      }
+    }
+
+    async function translateProblem() {
+      const problem = document.getElementById('problem');
+      const text = problem.value.trim();
+      const button = document.getElementById('translateButton');
+      if (!text) return showToast('Write something before translating.', true);
+      button.disabled = true;
+      try {
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`);
+        if (!response.ok) throw new Error('Translation service is unavailable.');
+        const data = await response.json();
+        const translated = data?.[0]?.map(segment => segment[0] || '').join('');
+        if (!translated) throw new Error('No translation was returned.');
+        problem.value = translated;
+        updateCharacterCount();
+        handleDraftInput();
+        showToast('Notes translated to English. Review the wording for accuracy.');
+      } catch (error) {
+        showToast(error.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function handleScreenshotSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 20 * 1024 * 1024) {
+        showToast('Image is too large. Maximum 20 MB.', true);
+        event.target.value = '';
+        return;
+      }
+      document.getElementById('uploadArea').hidden = true;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('previewImage').src = e.target.result;
+        document.getElementById('uploadFilename').textContent = file.name;
+        document.getElementById('uploadPreview').hidden = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUpload() {
+      document.getElementById('screenshotInput').value = '';
+      document.getElementById('uploadPreview').hidden = true;
+      document.getElementById('uploadLoading').hidden = true;
+      document.getElementById('uploadArea').hidden = false;
+    }
+
+    async function analyzeScreenshot() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) return showToast('Add your Groq API key in Desk setup.', true);
+      const preview = document.getElementById('previewImage');
+      if (!preview.src) return showToast('No screenshot loaded.', true);
+
+      const btn = document.querySelector('#uploadPreview .button.primary');
+      btn.disabled = true;
+      document.getElementById('uploadPreview').hidden = true;
+      document.getElementById('uploadLoading').hidden = false;
+
+      try {
+        const base64Image = preview.src;
+        const model = 'meta-llama/llama-4-scout-17b-16e-instruct';
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model,
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'text', text: 'This is a screenshot of an Instagram conversation or incident. Briefly describe exactly what you see: who is involved, what messages were exchanged, and what happened. Write the description as concise first-person notes. Keep it short. Be factual — do not infer intent or exaggerate.' },
+                { type: 'image_url', image_url: { url: base64Image } }
+              ]
+            }],
+            temperature: 0.3,
+            max_tokens: 800
+          })
+        });
+        if (!response.ok) {
+          const msg = response.status === 401 ? 'The API key was not accepted.' : `Groq returned an error (${response.status}).`;
+          throw new Error(msg);
+        }
+        const data = await response.json();
+        const text = data?.choices?.[0]?.message?.content?.trim();
+        if (!text) throw new Error('No analysis was returned.');
+
+        document.getElementById('problem').value = text;
+        updateCharacterCount();
+        handleDraftInput();
+        clearUpload();
+        showToast('Screenshot analyzed. Review and edit the extracted details.');
+      } catch (error) {
+        document.getElementById('uploadLoading').hidden = true;
+        document.getElementById('uploadPreview').hidden = false;
+        btn.disabled = false;
+        showToast(error.message || 'Analysis failed.', true);
+      }
+    }
+
+    async function runAssistTool(kind) {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const tool = assistToolPrompts[kind];
+      const notes = document.getElementById('problem').value.trim();
+      if (!tool) return showToast('That tool is unavailable right now.', true);
+      if (!apiKey) return showToast('Add your Groq API key in Desk setup.', true);
+      if (notes.length < 15) return showToast('Write a little more before using a quick tool.', true);
+
+      const toolButtons = document.querySelectorAll('.tool-card');
+      const loading = document.getElementById('toolLoading');
+      const loadingText = document.getElementById('toolLoadingText');
+      const resultCard = document.getElementById('toolResult');
+
+      toolButtons.forEach(button => { button.disabled = true; });
+      loading.hidden = false;
+      loadingText.textContent = `${tool.title} is working on your notes...`;
+      resultCard.hidden = true;
+
+      try {
+        const model = document.getElementById('model').value;
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: 'system', content: `${tool.prompt}\n\nReturn only the rewritten text.` },
+              { role: 'user', content: notes }
+            ],
+            temperature: 0.25,
+            max_tokens: 350
+          })
+        });
+        if (!response.ok) {
+          const errText = response.status === 401 ? 'The API key was not accepted.' : `Groq returned an error (${response.status}).`;
+          throw new Error(errText);
+        }
+        const data = await response.json();
+        const content = data?.choices?.[0]?.message?.content?.trim();
+        if (!content) throw new Error('No tool output was returned.');
+
+        currentToolResult = content;
+        document.getElementById('toolResultTitle').textContent = tool.title;
+        document.getElementById('toolResultBox').value = content;
+        resultCard.hidden = false;
+        showToast(`${tool.title} is ready.`);
+      } catch (error) {
+        showToast(error.message || 'The tool could not finish.', true);
+      } finally {
+        loading.hidden = true;
+        toolButtons.forEach(button => { button.disabled = false; });
+      }
+    }
+
+    function insertToolResult() {
+      if (!currentToolResult) return showToast('Run a quick tool first.', true);
+      const problem = document.getElementById('problem');
+      problem.value = `${problem.value.trim()}${problem.value.trim() ? '\n\n' : ''}${currentToolResult}`;
+      updateCharacterCount();
+      handleDraftInput();
+      problem.focus();
+      showToast('Tool output added to your notes.');
+    }
+
+    async function copyToolResult() {
+      if (!currentToolResult) return showToast('Run a quick tool first.', true);
+      try {
+        await navigator.clipboard.writeText(currentToolResult);
+        showToast('Tool output copied.');
+      } catch {
+        showToast('Clipboard access was blocked. Copy the tool text manually.', true);
+      }
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = chatHistory.map(msg => `
+        <div class="chat-msg ${msg.role}">${escapeHtml(msg.content)}</div>
+      `).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function refineChat(instruction) {
+      if (!instruction || !instruction.trim()) return;
+      const apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) return showToast('Add your Groq API key in Desk setup.', true);
+      if (!currentReport) return showToast('Generate a report first.', true);
+
+      const chatInput = document.getElementById('chatInput');
+      const chatSendBtn = document.getElementById('chatSendBtn');
+      chatInput.value = '';
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+
+      const currentReportText = document.getElementById('outputBox').value;
+      chatHistory.push({ role: 'user', content: instruction.trim() });
+      chatHistory.push({ role: 'assistant', content: '...' });
+      renderChatMessages();
+
+      const refinementSystemPrompt = `You are refining a support message for Instagram Support. You have the current version of the report and a user instruction for how to change it.
+
+Apply the user's instruction to the report. Keep the same factual content unless the instruction says to change it. Maintain the structure: greeting → factual sentences → requested action → thanks → sign-off. Do NOT invent new details, mention AI, or exceed 200 words.
+
+OUTPUT the complete revised report only — no labels, no preamble, no explanation.`;
+
+      const messages = [
+        { role: 'system', content: refinementSystemPrompt },
+        ...chatHistory.slice(0, -1),
+        { role: 'user', content: `Current report:\n${currentReportText}\n\nInstruction: ${instruction.trim()}` }
+      ];
+
+      try {
+        const model = document.getElementById('model').value;
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify({ model, messages, temperature: 0.35, max_tokens: 700 })
+        });
+        if (!response.ok) {
+          const errText = response.status === 401 ? 'The API key was not accepted.' : `Groq returned an error (${response.status}).`;
+          throw new Error(errText);
+        }
+        const data = await response.json();
+        const content = data?.choices?.[0]?.message?.content?.trim();
+        if (!content) throw new Error('No refined text was returned.');
+
+        chatHistory[chatHistory.length - 1].content = content;
+        document.getElementById('outputBox').value = content;
+        currentReport.message = content;
+        currentReport.timestamp = new Date().toISOString();
+        renderChatMessages();
+        showToast('Report updated with your changes.');
+      } catch (error) {
+        chatHistory.pop();
+        renderChatMessages();
+        showToast(error.message || 'Refinement failed.', true);
+      } finally {
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    async function copyMessage() {
+      const fullText = `${document.getElementById('categoryBox').textContent}\n\n${document.getElementById('outputBox').value}`;
+      try {
+        await navigator.clipboard.writeText(fullText);
+        showToast('Report copied to your clipboard.');
+      } catch {
+        showToast('Clipboard access was blocked. Select and copy the report manually.', true);
+      }
+    }
+
+    function exportReport() {
+      const content = `${document.getElementById('categoryBox').textContent}\n\n${document.getElementById('outputBox').value}`;
+      const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `instagram-report-${new Date().toISOString().slice(0, 10)}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('Text report exported.');
+    }
+
+    function saveReportToHistory() {
+      if (!currentReport) return showToast('Generate a report before filing it.', true);
+      const editedMessage = document.getElementById('outputBox').value.trim();
+      const entry = {
+        ...currentReport,
+        message: editedMessage,
+        problem: document.getElementById('problem').value.trim(),
+        username: document.getElementById('reportUsername').value.trim(),
+        model: document.getElementById('model').value,
+        status: 'filed',
+        timestamp: new Date().toISOString()
+      };
+      history.unshift(entry);
+      history = history.slice(0, 30);
+      localStorage.setItem('reportHistory', JSON.stringify(history));
+      currentReport = entry;
+      renderHistory();
+      updateStats();
+      setProgress(3);
+      showToast('Report filed in this device’s history.');
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (!history.length) {
+        list.innerHTML = '<div class="empty-state"><h3>No reports filed yet.</h3><p>Generated reports appear here after you choose “File report.”</p></div>';
+        return;
+      }
+      list.innerHTML = history.map((item, index) => `
+        <article class="history-card">
+          <div><div class="history-category">${escapeHtml(item.category || 'Uncategorized')}</div><div class="history-problem">${escapeHtml(truncate(item.problem || item.message, 220))}</div><div class="history-date">${formatDate(item.timestamp)}</div></div>
+          <div class="history-actions"><button class="button ghost small" type="button" onclick="loadFromHistory(${index})">Open</button><button class="button danger small" type="button" onclick="deleteFromHistory(${index})"><svg class="icon"><use href="#i-trash"/></svg></button></div>
+        </article>`).join('');
+    }
+
+    function loadFromHistory(index) {
+      const item = history[index];
+      currentReport = item;
+      document.getElementById('problem').value = item.problem || '';
+      document.getElementById('reportUsername').value = item.username || '';
+      document.getElementById('categoryBox').textContent = item.category || 'Something else';
+      document.getElementById('outputBox').value = item.message || '';
+      document.getElementById('outputCard').classList.add('visible');
+      updateCharacterCount();
+      switchTab('editor');
+      setProgress(2);
+      document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function deleteFromHistory(index) {
+      history.splice(index, 1);
+      localStorage.setItem('reportHistory', JSON.stringify(history));
+      renderHistory();
+      updateStats();
+      showToast('Filed report removed.');
+    }
+
+    function saveCustomTemplate() {
+      const name = document.getElementById('customName').value.trim();
+      const content = document.getElementById('customContent').value.trim();
+      if (!name || !content) return showToast('Add both a template name and starting notes.', true);
+      customTemplates.unshift({ name, content, timestamp: new Date().toISOString() });
+      localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+      document.getElementById('customName').value = '';
+      document.getElementById('customContent').value = '';
+      renderCustomTemplates();
+      updateStats();
+      showToast('Custom template saved.');
+    }
+
+    function renderCustomTemplates() {
+      const list = document.getElementById('customList');
+      if (!customTemplates.length) {
+        list.innerHTML = '<div class="empty-state"><h3>No custom templates.</h3><p>Your reusable starting points appear here.</p></div>';
+        return;
+      }
+      list.innerHTML = customTemplates.map((template, index) => `
+        <article class="custom-item"><div><strong>${escapeHtml(template.name)}</strong><p>${escapeHtml(truncate(template.content, 180))}</p></div><div class="history-actions"><button class="button ghost small" type="button" onclick="useTemplate(${index}, true)">Use</button><button class="button danger small" type="button" onclick="deleteCustomTemplate(${index})"><svg class="icon"><use href="#i-trash"/></svg></button></div></article>`).join('');
+    }
+
+    function deleteCustomTemplate(index) {
+      customTemplates.splice(index, 1);
+      localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+      renderCustomTemplates();
+      updateStats();
+      showToast('Custom template removed.');
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.createElement('div');
+      toast.className = `toast${isError ? ' error' : ''}`;
+      toast.textContent = message;
+      document.getElementById('toastRegion').appendChild(toast);
+      setTimeout(() => toast.remove(), 4200);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
+    }
+
+    function truncate(value, length) {
+      const text = String(value || '');
+      return text.length > length ? `${text.slice(0, length).trim()}…` : text;
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? 'Date unavailable' : new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+    }
+  </script>
+</body>
+</html>
+
+
+
+
